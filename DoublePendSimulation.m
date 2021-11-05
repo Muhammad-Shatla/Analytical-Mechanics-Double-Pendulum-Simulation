@@ -1,53 +1,24 @@
-% This solves and animates the motion, angle, or angular velocity of a double 
-% pendulum system as it progresses through time
-%
-%   
-%   ---------------------------------------------------------------------
-%   
-%   @params ic
-%   ic = [theta1; angvel1; theta2; angvel2; grav; mass1; mass2; len1; len2;]
-%   ic - Initial Conditions, is a 9 length row vector that represents the
-%   initial conditions of the pendulm system.
-%   a 1 after the parameter name means upper pendulum, 2 means lower pendulum.
-%
-%   @param time
-%   The length in seconds of the simulation. It must always start at zero,
-%   and it's value will be the length of the simulation at 100% of normal
-%   running speed
-%
-%   @param simspeed
-%   This number is a double that represents a percentage in a decimal
-%   format. This percentage is the simulation speed as a percentage of the
-%   normal speed. So 50% speed would have simspeed = 0.5.
-%
-%   @param angorangvel
-%   This is either a 1 or a 2, do not pass in a value besides these. If it
-%   is a 1, then the graph on the right will show the angles of the two
-%   pendulums as they move throughout time. If this value is a 2, then the
-%   graph on the right will be the angular velocities of the two pendulums
-%   as they move throughout time.
+% Solving for the motion and angular velocity of a double 
+% pendulum system evolving in time. 
 
-%%   ---------------------------------------------------------------------
 
-function DoublePendSimulation(ic, time, simspeed, angorangvel)
+
+function DoublePendSimulation(vec, time, simspeed, angorangvel)
 clear All;
 
 opengl software;
 
-%define the normal frames per second of the animation and the adjusted
-%frames per second based on the simspeed variable.
+
 fpsnormal = 30;
 fps = fpsnormal*simspeed; 
 numframes=time*fps;
 
-%define the tolerances for the Runge-Kutta method of the differential
-%equation
 options = odeset('Refine',6,'RelTol',1e-5,'AbsTol',1e-7); 
 
 %solve the differential equations defined in the file @DoublePEndEquations,
 %over the interval t = 0 to t = time, with the initial conditions specified
 %in the vector ic, according to the options defined directly above.
-solutionsstruct=ode45(@DoublePendEquations,[0 time], ic, options);
+solutionsstruct=ode45(@DoublePendEquations,[0 time], vec, options);
 %define a discrete vector of points that we want to obtain the solutions on
 t = linspace(0,time,numframes);
 %obtain the values of the differential equations defined on the linespace
@@ -58,11 +29,11 @@ solutionsvector=deval(solutionsstruct,t);
 theta1=solutionsvector(1,:)'; angvel1=solutionsvector(2,:)';
 theta2=solutionsvector(3,:)'; angvel2=solutionsvector(4,:)';
 %get the individual initial conditions and constants passed in by the user
-len1=ic(8); len2=ic(9);
-m1 = ic(6); m2 = ic(7);
+len1=vec(8); len2=vec(9);
+m1 = vec(6); m2 = vec(7);
 moment1 = 0.5.*m1.*len1.^2;
 moment2 = 0.5*m2.*len2.^2;
-grav = ic(5);
+grav = vec(5);
 
 %initialize vectors to hold the x and y coordinated of the lines we are
 %going to be plotting
